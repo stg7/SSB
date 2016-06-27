@@ -43,6 +43,23 @@ from sleekxmpp.exceptions import IqError, IqTimeout
 import ssl
 import inspect
 
+
+import subprocess
+
+
+def shell_call(call):
+    """
+    Run a program via system call and return stdout + stderr.
+    @param call programm and command line parameter list, e.g ["ls", "/"]
+    @return stdout and stderr of programm call
+    """
+    try:
+        output = subprocess.check_output(call, stderr=subprocess.STDOUT, universal_newlines=True)
+    except Exception as e:
+        output = str(e.output)
+    return output
+
+
 class BotCMDs:
     """
     Handler for Bot Commands
@@ -153,10 +170,17 @@ class XMPPBot(ClientXMPP):
     def ping(self, args, msg):
         """ simple ping pong example"""
         return "pong " + str(args)
+
     @BotCMD
     def debug(self, args, msg):
         """ printout message debug infos """
         return str(args) + "\n" + str(msg)
+
+    @BotCMD
+    def ipadress(self):
+        """ printout ipadress via http://whatismyip.org/ """
+        return shell_call(["./ipadress.sh"])
+
 
 """    @BotCMD
     def screen(self, args, msg):
